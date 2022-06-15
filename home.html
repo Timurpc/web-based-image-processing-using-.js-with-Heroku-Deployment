@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+      Photo Editor // By Timur 2022.06.10
+    </title>
+</head>
+<body onload="init();" onresize="resize()">
+    <link rel="stylesheet" href="style.css">
+    <div id="top-container">
+        <h1 style="font-family:Verdana;">Photo Editor // By Timur</h1>
+    </div>
+    <div>
+        <div id="cooper">
+            <b class="text-center" style="font-size: 50px;  color: #FF9633; padding: 5px;">Upload your photo here...</b>
+        </div>
+        <div class="option-select" style="margin-left: 5px">
+            <input style="margin-top: 15px;" type="file" id="img-loader" accept="image/jpeg, image/png" onchange="Canvas.updateImage()">
+        </div>
+    </div>
+    <div id="bottom-container">
+        <div  class="container">
+            <div class="option-box" >
+                <div class="option-title">
+                    <b>Filter</b>
+                </div>
+                <div class="option-select">
+                    <select id="filter-select" onchange="updateOptions(); Canvas.drawImage();">
+                        <option value="original" selected>No filter</option>
+                        <option value="grayscale">Grayscale</option>
+                        <option value="glass">Glass</option>
+                        <option value="blur">Blur</option>
+                        <option value="edge">Edge Detection</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: none;", class="option-box">
+                <div class="option-title">
+                    <b></b>
+                </div>
+                <div class="option-select">
+                    <input type="range" id="bit-depth" min="0" max="8" value="8" oninput="Canvas.drawImage()"></input>
+                </div>
+            </div>
+            <div style="display: none;", class="option-box">
+                <div class="option-title">
+                    <b></b>
+                </div>
+                <div style="display: none;", class="option-select">
+                    <select id="dithering-algo" onchange="Canvas.drawImage();">
+                        <option value="none" selected>No dithering</option>
+                        <option value="floyd-steinberg">Floyd-Steinberg</option>
+                    </select>
+                </div>
+            </div>
+            <div class="option-group">
+                <div class="option-box">
+                    <div class="option-title">
+                        <b></b>
+                    </div>
+                    <div style="display: none;", class="option-box">
+                        <select id="flip-axis" onchange="Canvas.drawImage();">
+                            <option value="vertical" selected>Vertical</option>
+                            <option value="horizontal">Horizontal</option>
+                            <option value="both">Both</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;", class="option-group" id="grayscale-group">
+                <div class="option-box">
+                    <div class="option-title">
+                        <b></b>
+                    </div>
+                    <div class="option-box">
+                        <select id="grayscale-mode" onchange="updateOptions(); Canvas.drawImage();">
+                            <option value="desaturation" selected>Desaturation</option>
+                            <option value="average">Average</option>
+                            <option value="luminance">Luminance</option>
+                            <option value="decomposition">Decomposition</option>
+                            <option value="single-color">Single Color</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;", class="option-group">
+                <div class="option-box">
+                    <div class="option-title">
+                        <b></b>
+                    </div>
+                    <div class="option-box">
+                        <select id="monochrome-mode" onchange="Canvas.drawImage();">
+                            <option value="red" selected></option>
+                            <option value="green"></option>
+                            <option value="blue"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;", class="option-group">
+                <div class="option-box">
+                    <div class="option-title">
+                        <b></b>
+                    </div>
+                    <div class="option-box">
+                        <select id="dichrome-mode" onchange="Canvas.drawImage();">
+                            <option value="blue" selected>Red and Green</option>
+                            <option value="green">Red and Blue</option>
+                            <option value="red">Green and Blue</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;", class="option-group">
+                <div class="option-box">
+                    <div class="option-title">
+                        <b></b>
+                    </div>
+                    <div class="option-box">
+                        <input type="range" id="glass-thickness" min="0" max="50" value="10"
+                            oninput="Canvas.drawImage()"></input>
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;", class="option-group" id="blur-group">
+                <div class="option-box">
+                    <div class="option-title">
+                        <b></b>
+                    </div>
+                    <div class="option-box">
+                        <input type="range" id="blurriness" min="0" max="50" value="10"
+                            oninput="Canvas.drawImage()"></input>
+                    </div>
+                </div>
+                <div class="option-box">
+                    <div class="option-title">
+                        <b></b>
+                    </div>
+                    <div class="option-box">
+                        <select id="blur-mode" onchange="updateOptions(); Canvas.drawImage();">
+                            <option value="motion" selected></option>
+                            <option value="box"></option>
+                            <option value="tent"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;", class="option-group">
+                <div class="option-box">
+                    <div class="option-title">
+                        <b></b>
+                    </div>
+                    <div class="option-box">
+                        <input type="range" id="posterize-depth" min="1" max="256" value="64"
+                            oninput="Canvas.drawImage()"></input>
+                    </div>
+                </div>
+            </div>
+            <div class="option-group">
+                <div class="option-box">
+                    <div class="option-title">
+                        <b></b>
+                    </div>
+                    <div class="option-box">
+                        <input type="range" id="solarize-threshold" min="0" max="256" value="64"
+                            oninput="Canvas.drawImage()"></input>
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;", class="option-group" id="edge-group">
+                <div class="option-box">
+                    <div class="option-title">
+                        <b></b>
+                    </div>
+                    <div class="option-box">
+                        <select id="edge-mode" onchange="Canvas.drawImage();">
+                            <option value="sobel" selected></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;", class="option-group" id="decomposition-group">
+                <div class="option-box">
+                    <div class="option-title">
+                        <b></b>
+                    </div>
+                    <div class="option-box">
+                        <select id="decomposition-mode" onchange="Canvas.drawImage();">
+                            <option value="max" selected></option>
+                            <option value="min"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;", class="option-group" id="single-color-group">
+                <div class="option-box">
+                    <div class="option-title">
+                        <b></b>
+                    </div>
+                    <div class="option-box">
+                        <select id="single-color-mode" onchange="Canvas.drawImage();">
+                            <option value="red" selected></option>
+                            <option value="green"></option>
+                            <option value="blue"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;", class="option-group" id="motion-blur-group">
+                <div class="option-box">
+                    <div class="option-title">
+                        <b></b>
+                    </div>
+                    <div class="option-box">
+                        <select id="motion-blur-mode" onchange="Canvas.drawImage();">
+                            <option value="vertical" selected></option>
+                            <option value="horizontal"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;", class="option-group" id="sobel-group">
+                <div class="option-box">
+                    <div class="option-title">
+                        <b></b>
+                    </div>
+                    <div class="option-box">
+                        <select id="sobel-mode" onchange="Canvas.drawImage();">
+                            <option value="both" selected></option>
+                            <option value="vertical"></option>
+                            <option value="horizontal"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container" style="width: 70%;">
+            <canvas id="main-canvas"></canvas>
+        </div>
+    </div>
+    <script src="src/scripts/textFit.js"></script>
+    <script src="src/scripts/canvasToBlob.js"></script>
+    <script src="src/scripts/fileSaver.js"></script>
+    <script src="src/scripts/algorithm.js"></script>
+    <script src="src/scripts/canvas.js"></script>
+    <script>
+        function init() {
+            resize();
+            loadImage();
+            document.addEventListener("keydown", function (e) {
+                if ((window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey) && e.keyCode == 83) {
+                    e.preventDefault();
+                    var or = Canvas.originalImage.width / Canvas.originalImage.height;
+                    var cr = Canvas.canvas.width / Canvas.canvas.height;
+                    var sw = or > cr ? Canvas.canvas.width : Canvas.canvas.height * or;
+                    var sh = or > cr ? Canvas.canvas.width / or : Canvas.canvas.height;
+                    var imageData = Canvas.context.getImageData((Canvas.canvas.width - sw) / 2, (Canvas.canvas.height - sh) / 2, sw, sh);
+                    var container = document.getElementsByClassName("container")[1];
+                    var saveCanvas = document.createElement("canvas");
+                    container.appendChild(saveCanvas);
+                    saveCanvas.width = sw;
+                    saveCanvas.height = sh;
+                    saveCanvas.getContext("2d").putImageData(imageData, 0, 0);
+                    saveCanvas.toBlob(function (blob) {
+                        saveAs(blob, "image.png");
+                    });
+                    container.removeChild(saveCanvas);
+                }
+            }, false);
+        }
+
+        function resize() {
+            textFit(document.getElementById("top-container"), { alignVert: true, alignHoriz: true });
+            var titles = document.getElementsByClassName("option-title");
+            for (var i = 0; i < titles.length; ++i) {
+                titles[i].style.fontSize = `${titles[0].offsetHeight / 2}px`;
+            }
+            var container = document.getElementsByClassName("container")[1];
+            Canvas.resize(container.offsetWidth, container.offsetHeight);
+        }
+
+        function updateOptions() {
+            var groups = document.getElementsByClassName("option-group");
+            for (var i = 0; i < groups.length; i++) {
+                groups[i].classList.remove("active");
+            }
+            var filter = document.getElementById("filter-select");
+            if (filter.selectedIndex > 0) {
+                groups[filter.selectedIndex - 1].classList.add("active");
+                if (groups[filter.selectedIndex - 1].id == "grayscale-group" && document.getElementById("grayscale-mode").value == "decomposition") {
+                    document.getElementById("decomposition-group").classList.add("active");
+                } else if (groups[filter.selectedIndex - 1].id == "grayscale-group" && document.getElementById("grayscale-mode").value == "single-color") {
+                    document.getElementById("single-color-group").classList.add("active");
+                } else if (groups[filter.selectedIndex - 1].id == "blur-group" && document.getElementById("blur-mode").value == "motion") {
+                    document.getElementById("motion-blur-group").classList.add("active");
+                } else if (groups[filter.selectedIndex - 1].id == "edge-group" && document.getElementById("edge-mode").value == "sobel") {
+                    document.getElementById("sobel-group").classList.add("active");
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
